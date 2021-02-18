@@ -1,17 +1,18 @@
 package ru.sign6891.chaton
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.google.firebase.auth.FirebaseAuth
+import com.theartofdev.edmodo.cropper.CropImage
 import ru.sign6891.chaton.activities.RegisterActivity
 import ru.sign6891.chaton.databinding.ActivityMainBinding
+import ru.sign6891.chaton.models.User
 import ru.sign6891.chaton.ui.fragments.ChatsFragment
 import ru.sign6891.chaton.ui.objects.AppDrawer
-import ru.sign6891.chaton.utilits.AUTH
-import ru.sign6891.chaton.utilits.initFirebase
-import ru.sign6891.chaton.utilits.replaceActivity
-import ru.sign6891.chaton.utilits.replaceFragment
+import ru.sign6891.chaton.utilits.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,12 +24,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
-    }
+        APP_ACTIVITY = this
+        initFirebase()
+        //Функция высшего порядка.
+        //Она выполнется доконца, а после запустятся две нижние функции внури
+        initUser{
+            initFields()
+            initFunc()
+        }
 
-    override fun onStart() {
-        super.onStart()
-        initFields()
-        initFunc()
     }
 
     private fun initFunc() {
@@ -45,6 +49,16 @@ class MainActivity : AppCompatActivity() {
     private fun initFields() {
         mToolbar = mBinding.mainToolbar
         mAppDrawer = AppDrawer(this, mToolbar)
-        initFirebase()
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        AppState.updateState(AppState.ONLINE)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        AppState.updateState(AppState.OFFLINE)
     }
 }
