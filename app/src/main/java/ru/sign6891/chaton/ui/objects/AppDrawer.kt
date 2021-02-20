@@ -18,12 +18,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
 import ru.sign6891.chaton.R
+import ru.sign6891.chaton.ui.fragments.ContactsFragment
 import ru.sign6891.chaton.ui.fragments.SettingsFragment
+import ru.sign6891.chaton.utilits.APP_ACTIVITY
 import ru.sign6891.chaton.utilits.USER
 import ru.sign6891.chaton.utilits.downloadAndSetImage
 import ru.sign6891.chaton.utilits.replaceFragment
 
-class AppDrawer(val mainActivity: AppCompatActivity, val toolbar: Toolbar) {
+class AppDrawer() {
 
     private lateinit var mDrawer: Drawer
     private lateinit var mHeader: AccountHeader
@@ -41,25 +43,25 @@ class AppDrawer(val mainActivity: AppCompatActivity, val toolbar: Toolbar) {
     // Блокируем показ выдвижного меню.
     fun disableDrawer(){
         mDrawer.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
-        mainActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true) // установили в тулбаре стрелку назад
+        APP_ACTIVITY.supportActionBar?.setDisplayHomeAsUpEnabled(true) // установили в тулбаре стрелку назад
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED) // Заблокировали менюшку
-        toolbar.setNavigationOnClickListener {
-            mainActivity.supportFragmentManager.popBackStack()
+        APP_ACTIVITY.mToolbar.setNavigationOnClickListener {
+            APP_ACTIVITY.supportFragmentManager.popBackStack()
         }
     }
 
     // Активируем показ выдвижного меню
     fun enableDrawer(){
-        mainActivity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        APP_ACTIVITY.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         mDrawer.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-        toolbar.setNavigationOnClickListener { mDrawer.openDrawer() }
+        APP_ACTIVITY.mToolbar.setNavigationOnClickListener { mDrawer.openDrawer() }
     }
 
     private fun createDrawer() {
         mDrawer = DrawerBuilder()
-            .withActivity(mainActivity)
-            .withToolbar(toolbar)
+            .withActivity(APP_ACTIVITY)
+            .withToolbar(APP_ACTIVITY.mToolbar)
             .withActionBarDrawerToggle(true)
             .withSelectedItem(-1)
             .withAccountHeader(mHeader)
@@ -116,12 +118,17 @@ class AppDrawer(val mainActivity: AppCompatActivity, val toolbar: Toolbar) {
                     position: Int,
                     drawerItem: IDrawerItem<*>
                 ): Boolean {
-                    when (position) {
-                        7 -> mainActivity.replaceFragment(SettingsFragment())
-                    }
+                    clickToItem(position)
                     return false
                 }
             }).build()
+    }
+
+    private fun clickToItem(position:Int) {
+        when (position) {
+            4 -> APP_ACTIVITY.replaceFragment(ContactsFragment())
+            7 -> APP_ACTIVITY.replaceFragment(SettingsFragment())
+        }
     }
 
     private fun createHeader() {
@@ -132,7 +139,7 @@ class AppDrawer(val mainActivity: AppCompatActivity, val toolbar: Toolbar) {
             .withIdentifier(200)
 
         mHeader = AccountHeaderBuilder()
-            .withActivity(mainActivity)
+            .withActivity(APP_ACTIVITY)
             .withHeaderBackground(R.drawable.header)
             .addProfiles(
                 mCurrentProfile
